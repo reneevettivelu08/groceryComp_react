@@ -1,0 +1,22 @@
+[build]
+  base    = "client"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Redirect /api/* calls to the Heroku backend
+# Set VITE_API_URL in the Netlify dashboard environment variables
+# e.g. VITE_API_URL = https://your-app.herokuapp.com
+[[redirects]]
+  from   = "/api/*"
+  to     = ":VITE_API_URL/api/:splat"
+  status = 200
+  force  = true
+
+# SPA fallback — send all unmatched routes to index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
