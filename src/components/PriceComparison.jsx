@@ -28,19 +28,23 @@ function formatPrice(val) {
 }
 
 const ODD_BUNCH_PRICES = {
-  'small-mixed':  14.99,
-  'small-fruit':  14.99,
-  'small-veg':    14.99,
-  'medium-mixed': 21.99,
-  'large-mixed':  27.99,
+  'small-mixed':  20.00,
+  'medium-mixed': 32.00,
+  'large-mixed':  46.00,
+   'all-veggie':  32.00,
+  'all-fruit':  32.00,
+'small-organic':  32.00,
+  'medium-organic': 46.00
 }
 
 const BOX_SIZE_LABELS = {
   'small-mixed':  'Small (Mixed)',
-  'small-fruit':  'Small (Fruit)',
-  'small-veg':    'Small (Veg)',
   'medium-mixed': 'Medium (Mixed)',
   'large-mixed':  'Large (Mixed)',
+  'all-veggie':  'All Veggie',
+  'all-fruit':  'All Fruit',
+'small-organic':  'Small Organic',
+  'medium-organic': 'Medium Organic'
 }
 
 const STORE_COLORS = {
@@ -73,8 +77,12 @@ function ItemRow({ item, stores, onResolved }) {
           setResults(prev => ({ ...prev, [banner]: res }))
           setSelected(prev => ({ ...prev, [banner]: 0 }))
           const product = res[0]
-          if (product && oddBunchGrams && product.pricePerKg) {
-            onResolved(banner, (oddBunchGrams / 1000) * product.pricePerKg)
+          if (product) {
+            if (oddBunchGrams && product.pricePerKg) {
+              onResolved(banner, (oddBunchGrams / 1000) * product.pricePerKg)
+            } else if (product.price) {
+              onResolved(banner, product.price)
+            }
           }
         })
         .catch(err => setErrors(prev => ({ ...prev, [banner]: err.message })))
@@ -90,9 +98,9 @@ function ItemRow({ item, stores, onResolved }) {
       >
         <div>
           <span style={{ fontWeight: 500, fontSize: 14 }}>{item.name}</span>
-          <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>
-            {item.qty} {item.unit}{item.country ? ` · ${item.country}` : ''}
-          </span>
+          {item.country && (
+            <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>{item.country}</span>
+          )}
         </div>
         <span style={{ fontSize: 11, color: '#bbb' }}>{expanded ? '▲ less' : '▼ alternatives'}</span>
       </div>
@@ -105,10 +113,19 @@ function ItemRow({ item, stores, onResolved }) {
           const isLoading    = loading[banner]
           const error        = errors[banner]
 
+          // Calculate the best comparable cost we can for this item:
+          // - If item has weight AND product has per-kg price → most accurate
+          // - If item has weight but product only has flat price → note it's approximate
+          // - If no weight conversion possible → just show the flat price
           let comparableNote = null
-          if (product && oddBunchGrams && product.pricePerKg) {
-            const equiv = (oddBunchGrams / 1000) * product.pricePerKg
-            comparableNote = `≈ ${formatPrice(equiv)} for ${item.qty} ${item.unit}`
+          let comparableCost = null
+          if (product) {
+            if (oddBunchGrams && product.pricePerKg) {
+              comparableCost = (oddBunchGrams / 1000) * product.pricePerKg
+              comparableNote = `≈ ${formatPrice(comparableCost)} for ${item.qty} ${item.unit}`
+            } else if (product.price) {
+              comparableCost = product.price
+            }
           }
 
           return (
@@ -153,8 +170,12 @@ function ItemRow({ item, stores, onResolved }) {
                     const newIdx = +e.target.value
                     setSelected(prev => ({ ...prev, [banner]: newIdx }))
                     const p = storeResults[newIdx]
-                    if (p && oddBunchGrams && p.pricePerKg) {
-                      onResolved(banner, (oddBunchGrams / 1000) * p.pricePerKg)
+                    if (p) {
+                      if (oddBunchGrams && p.pricePerKg) {
+                        onResolved(banner, (oddBunchGrams / 1000) * p.pricePerKg)
+                      } else if (p.price) {
+                        onResolved(banner, p.price)
+                      }
                     }
                   }}
                   style={{ marginTop: 8, width: '100%', height: 28, border: '1px solid #ddd', borderRadius: 6, fontSize: 11, fontFamily: 'inherit', background: 'white', cursor: 'pointer' }}
@@ -184,7 +205,7 @@ function SummaryRow({ storeTotals, stores, oddBunchPrice }) {
           Estimated totals
         </span>
         <span style={{ fontSize: 11, color: '#bbb' }}>
-          Items with weight only · pieces/bunch excluded
+          Weight items use per-kg price · others use flat price
         </span>
       </div>
 

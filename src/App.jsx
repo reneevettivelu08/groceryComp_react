@@ -25,10 +25,10 @@ export default function App() {
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.3px' }}>
-          🥦 groceryComp
+          🥦 Renee's Grocery Comparison Tool
         </h1>
         <p style={{ color: '#666', fontSize: 13, marginTop: 4 }}>
-          Odd Bunch vs Ontario grocery stores
+          Odd Bunch vs No Frills
         </p>
       </div>
 

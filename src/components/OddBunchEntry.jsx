@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 
-const UNITS = ['pieces', 'grams', 'lbs', 'oz', 'bunch', 'whole', 'serving', 'kg']
+const UNITS = ['grams', 'kg', 'lbs', 'oz']
 const BOX_SIZES = [
   { value: 'small-mixed',  label: 'Small (Mixed)' },
-  { value: 'small-fruit',  label: 'Small (Fruit)' },
-  { value: 'small-veg',    label: 'Small (Veg)' },
   { value: 'medium-mixed', label: 'Medium (Mixed)' },
   { value: 'large-mixed',  label: 'Large (Mixed)' },
+  { value: 'all-veggie', label: 'All Veggie' },
+  { value: 'all-fruit',  label: 'All Fruit' },
+  { value: 'small-organic',  label: 'Small Organic' },
+  { value: 'medium-organic', label: 'Medium Organic' }
 ]
 const COUNTRIES = [
   { code: '',   label: 'Unknown' },
@@ -20,7 +22,6 @@ const COUNTRIES = [
   { code: 'ZA', label: '🇿🇦 South Africa' },
   { code: 'ES', label: '🇪🇸 Spain' },
   { code: 'IT', label: '🇮🇹 Italy' },
-  { code: 'IL', label: '🇮🇱 Israel' },
   { code: 'NL', label: '🇳🇱 Netherlands' },
 ]
 
